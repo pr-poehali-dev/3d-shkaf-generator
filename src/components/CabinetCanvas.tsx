@@ -214,6 +214,68 @@ const CabinetCanvas = ({ width, height, depth, material, plinthHeight, doorConfi
           ctx.fillRect(handleX - 2, handleY - 15, 4, 30);
         }
       }
+
+      ctx.strokeStyle = '#1A1F2C';
+      ctx.fillStyle = '#1A1F2C';
+      ctx.lineWidth = 1;
+      ctx.font = '14px Inter, sans-serif';
+
+      const heightLine = {
+        start: project(w / 2 + 20, -h / 2, 0),
+        end: project(w / 2 + 20, h / 2, 0),
+      };
+      ctx.beginPath();
+      ctx.moveTo(heightLine.start.x, heightLine.start.y);
+      ctx.lineTo(heightLine.end.x, heightLine.end.y);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(heightLine.start.x - 5, heightLine.start.y);
+      ctx.lineTo(heightLine.start.x + 5, heightLine.start.y);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(heightLine.end.x - 5, heightLine.end.y);
+      ctx.lineTo(heightLine.end.x + 5, heightLine.end.y);
+      ctx.stroke();
+      const heightTextY = (heightLine.start.y + heightLine.end.y) / 2;
+      ctx.fillText(`${height} см`, heightLine.end.x + 10, heightTextY);
+
+      const widthLine = {
+        start: project(-w / 2, h / 2 + 20, 0),
+        end: project(w / 2, h / 2 + 20, 0),
+      };
+      ctx.beginPath();
+      ctx.moveTo(widthLine.start.x, widthLine.start.y);
+      ctx.lineTo(widthLine.end.x, widthLine.end.y);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(widthLine.start.x, widthLine.start.y - 5);
+      ctx.lineTo(widthLine.start.x, widthLine.start.y + 5);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(widthLine.end.x, widthLine.end.y - 5);
+      ctx.lineTo(widthLine.end.x, widthLine.end.y + 5);
+      ctx.stroke();
+      const widthTextX = (widthLine.start.x + widthLine.end.x) / 2;
+      ctx.fillText(`${width} см`, widthTextX - 20, widthLine.end.y + 20);
+
+      const depthLine = {
+        start: project(-w / 2 - 20, 0, -d / 2),
+        end: project(-w / 2 - 20, 0, d / 2),
+      };
+      ctx.beginPath();
+      ctx.moveTo(depthLine.start.x, depthLine.start.y);
+      ctx.lineTo(depthLine.end.x, depthLine.end.y);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(depthLine.start.x - 5, depthLine.start.y);
+      ctx.lineTo(depthLine.start.x + 5, depthLine.start.y);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(depthLine.end.x - 5, depthLine.end.y);
+      ctx.lineTo(depthLine.end.x + 5, depthLine.end.y);
+      ctx.stroke();
+      const depthTextY = (depthLine.start.y + depthLine.end.y) / 2;
+      ctx.fillText(`${depth} см`, depthLine.start.x - 50, depthTextY);
     };
 
     const handleMouseDown = (e: MouseEvent) => {
