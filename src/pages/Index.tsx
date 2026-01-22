@@ -19,6 +19,8 @@ const Index = () => {
   const [width, setWidth] = useState(90);
   const [depth, setDepth] = useState(50);
   const [selectedMaterial, setSelectedMaterial] = useState('oak');
+  const [plinthHeight, setPlinthHeight] = useState(10);
+  const [doorConfig, setDoorConfig] = useState<'none' | 'left' | 'right' | 'double'>('none');
 
   const calculatePrice = () => {
     const volume = (height * width * depth) / 1000000;
@@ -50,6 +52,8 @@ const Index = () => {
                   height={height}
                   depth={depth}
                   material={selectedMaterial}
+                  plinthHeight={plinthHeight}
+                  doorConfig={doorConfig}
                 />
               </div>
               <p className="text-sm text-gray-500 text-center mt-4">
@@ -108,6 +112,47 @@ const Index = () => {
                     className="w-full"
                   />
                 </div>
+
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center">
+                    <Label>Высота цоколя</Label>
+                    <span className="text-sm font-medium text-[#1A1F2C]">{plinthHeight} см</span>
+                  </div>
+                  <Slider
+                    value={[plinthHeight]}
+                    onValueChange={(v) => setPlinthHeight(v[0])}
+                    min={0}
+                    max={20}
+                    step={1}
+                    className="w-full"
+                  />
+                </div>
+              </div>
+            </Card>
+
+            <Card className="p-6">
+              <h2 className="text-lg font-semibold text-[#1A1F2C] mb-4">Двери</h2>
+
+              <div className="grid grid-cols-2 gap-3 mb-6">
+                {[
+                  { id: 'none', name: 'Нет дверей', icon: 'XCircle' },
+                  { id: 'left', name: 'Левая дверь', icon: 'ChevronLeft' },
+                  { id: 'right', name: 'Правая дверь', icon: 'ChevronRight' },
+                  { id: 'double', name: 'Две двери', icon: 'ChevronsLeftRight' },
+                ].map((door) => (
+                  <button
+                    key={door.id}
+                    onClick={() => setDoorConfig(door.id as typeof doorConfig)}
+                    className={`p-4 rounded-lg border-2 transition-all hover:scale-105 flex flex-col items-center gap-2 ${
+                      doorConfig === door.id
+                        ? 'border-[#1A1F2C] shadow-md bg-gray-50'
+                        : 'border-gray-200 hover:border-gray-300'
+                    }`}
+                  >
+                    <Icon name={door.icon} size={24} />
+                    <p className="text-sm font-medium text-[#1A1F2C] text-center">{door.name}</p>
+                  </button>
+                ))}
               </div>
             </Card>
 

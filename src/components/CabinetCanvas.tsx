@@ -5,9 +5,11 @@ interface CabinetCanvasProps {
   height: number;
   depth: number;
   material: string;
+  plinthHeight: number;
+  doorConfig: 'none' | 'left' | 'right' | 'double';
 }
 
-const CabinetCanvas = ({ width, height, depth, material }: CabinetCanvasProps) => {
+const CabinetCanvas = ({ width, height, depth, material, plinthHeight, doorConfig }: CabinetCanvasProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const angleXRef = useRef(0.3);
   const angleYRef = useRef(0.4);
@@ -85,7 +87,7 @@ const CabinetCanvas = ({ width, height, depth, material }: CabinetCanvasProps) =
 
       const walls = [
         { outer: [0, 1, 2, 3], inner: [0, 1, 2, 3], color: colors.main, name: 'front' },
-        { outer: [4, 5, 6, 7], inner: [4, 5, 6, 7], color: colors.light, name: 'back' },
+        { outer: [4, 5, 6, 7], inner: [4, 5, 6, 7], color: '#FFFFFF', name: 'back' },
         { outer: [0, 1, 5, 4], inner: [0, 1, 5, 4], color: colors.shadow, name: 'bottom' },
         { outer: [2, 3, 7, 6], inner: [2, 3, 7, 6], color: colors.light, name: 'top' },
         { outer: [1, 2, 6, 5], inner: [1, 2, 6, 5], color: colors.main, name: 'right' },
@@ -96,7 +98,7 @@ const CabinetCanvas = ({ width, height, depth, material }: CabinetCanvasProps) =
         const outerWall = wall.outer.map((i) => outerVertices[i]);
         const innerWall = wall.inner.map((i) => innerVertices[i]);
 
-        ctx.fillStyle = wall.color + '80';
+        ctx.fillStyle = wall.name === 'back' ? wall.color : wall.color + '80';
         ctx.strokeStyle = '#1A1F2C';
         ctx.lineWidth = 1.5;
 
@@ -123,6 +125,95 @@ const CabinetCanvas = ({ width, height, depth, material }: CabinetCanvasProps) =
           ctx.stroke();
         }
       });
+
+      if (plinthHeight > 0) {
+        const plinthH = plinthHeight * scale;
+        const plinthVertices = [
+          project(-w / 2, -h / 2, -d / 2),
+          project(w / 2, -h / 2, -d / 2),
+          project(w / 2, -h / 2 + plinthH, -d / 2),
+          project(-w / 2, -h / 2 + plinthH, -d / 2),
+          project(-w / 2, -h / 2, d / 2),
+          project(w / 2, -h / 2, d / 2),
+          project(w / 2, -h / 2 + plinthH, d / 2),
+          project(-w / 2, -h / 2 + plinthH, d / 2),
+        ];
+
+        const plinthFaces = [
+          [0, 1, 2, 3],
+          [4, 5, 6, 7],
+          [1, 2, 6, 5],
+          [0, 3, 7, 4],
+        ];
+
+        plinthFaces.forEach((face) => {
+          ctx.fillStyle = colors.shadow;
+          ctx.strokeStyle = '#1A1F2C';
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          ctx.moveTo(plinthVertices[face[0]].x, plinthVertices[face[0]].y);
+          face.forEach((idx) => ctx.lineTo(plinthVertices[idx].x, plinthVertices[idx].y));
+          ctx.closePath();
+          ctx.fill();
+          ctx.stroke();
+        });
+      }
+
+      if (doorConfig !== 'none') {
+        const doorMargin = 0.5 * scale;
+        const doorThickness = 1.6 * scale;
+
+        if (doorConfig === 'left' || doorConfig === 'double') {
+          const doorWidth = doorConfig === 'double' ? (w - doorMargin * 3) / 2 : w - doorMargin * 2;
+          const leftDoorVertices = [
+            project(-w / 2 + doorMargin, -h / 2 + (plinthHeight > 0 ? plinthHeight * scale : 0) + doorMargin, -d / 2 - doorThickness),
+            project(-w / 2 + doorMargin + doorWidth, -h / 2 + (plinthHeight > 0 ? plinthHeight * scale : 0) + doorMargin, -d / 2 - doorThickness),
+            project(-w / 2 + doorMargin + doorWidth, h / 2 - doorMargin, -d / 2 - doorThickness),
+            project(-w / 2 + doorMargin, h / 2 - doorMargin, -d / 2 - doorThickness),
+          ];
+
+          ctx.fillStyle = colors.main;
+          ctx.strokeStyle = '#1A1F2C';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(leftDoorVertices[0].x, leftDoorVertices[0].y);
+          leftDoorVertices.forEach((v) => ctx.lineTo(v.x, v.y));
+          ctx.closePath();
+          ctx.fill();
+          ctx.stroke();
+
+          const handleX = leftDoorVertices[1].x - 10 * scale;
+          const handleY = (leftDoorVertices[1].y + leftDoorVertices[2].y) / 2;
+          ctx.fillStyle = '#666';
+          ctx.fillRect(handleX - 2, handleY - 15, 4, 30);
+        }
+
+        if (doorConfig === 'right' || doorConfig === 'double') {
+          const doorWidth = doorConfig === 'double' ? (w - doorMargin * 3) / 2 : w - doorMargin * 2;
+          const rightOffset = doorConfig === 'double' ? doorMargin * 2 + doorWidth : doorMargin;
+          const rightDoorVertices = [
+            project(-w / 2 + rightOffset, -h / 2 + (plinthHeight > 0 ? plinthHeight * scale : 0) + doorMargin, -d / 2 - doorThickness),
+            project(-w / 2 + rightOffset + doorWidth, -h / 2 + (plinthHeight > 0 ? plinthHeight * scale : 0) + doorMargin, -d / 2 - doorThickness),
+            project(-w / 2 + rightOffset + doorWidth, h / 2 - doorMargin, -d / 2 - doorThickness),
+            project(-w / 2 + rightOffset, h / 2 - doorMargin, -d / 2 - doorThickness),
+          ];
+
+          ctx.fillStyle = colors.main;
+          ctx.strokeStyle = '#1A1F2C';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(rightDoorVertices[0].x, rightDoorVertices[0].y);
+          rightDoorVertices.forEach((v) => ctx.lineTo(v.x, v.y));
+          ctx.closePath();
+          ctx.fill();
+          ctx.stroke();
+
+          const handleX = doorConfig === 'double' ? rightDoorVertices[0].x + 10 * scale : rightDoorVertices[1].x - 10 * scale;
+          const handleY = (rightDoorVertices[0].y + rightDoorVertices[3].y) / 2;
+          ctx.fillStyle = '#666';
+          ctx.fillRect(handleX - 2, handleY - 15, 4, 30);
+        }
+      }
     };
 
     const handleMouseDown = (e: MouseEvent) => {
@@ -158,7 +249,7 @@ const CabinetCanvas = ({ width, height, depth, material }: CabinetCanvasProps) =
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseup', handleMouseUp);
     };
-  }, [width, height, depth, material]);
+  }, [width, height, depth, material, plinthHeight, doorConfig]);
 
   return (
     <canvas
