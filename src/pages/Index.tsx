@@ -29,7 +29,7 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-blue-50">
+    <div className="min-h-screen bg-white">
       <header className="border-b border-gray-200">
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
@@ -46,7 +46,7 @@ const Index = () => {
         <div className="grid lg:grid-cols-[1fr_400px] gap-8">
           <div className="space-y-4">
             <Card className="p-6 bg-gray-50">
-              <div className="aspect-[4/3] bg-white rounded-lg overflow-hidden shadow-inner">
+              <div className="aspect-[4/3] bg-blue-50 rounded-lg overflow-hidden shadow-inner">
                 <CabinetCanvas
                   width={width}
                   height={height}
