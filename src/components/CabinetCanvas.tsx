@@ -41,6 +41,7 @@ const CabinetCanvas = ({ width, height, depth, material }: CabinetCanvasProps) =
       const w = width * scale;
       const h = height * scale;
       const d = depth * scale;
+      const wallThickness = 1.6 * scale;
 
       const cos = Math.cos(angleYRef.current);
       const sin = Math.sin(angleYRef.current);
@@ -59,7 +60,7 @@ const CabinetCanvas = ({ width, height, depth, material }: CabinetCanvasProps) =
         };
       };
 
-      const vertices = [
+      const outerVertices = [
         project(-w / 2, -h / 2, -d / 2),
         project(w / 2, -h / 2, -d / 2),
         project(w / 2, h / 2, -d / 2),
@@ -70,29 +71,56 @@ const CabinetCanvas = ({ width, height, depth, material }: CabinetCanvasProps) =
         project(-w / 2, h / 2, d / 2),
       ];
 
-      const faces = [
-        { indices: [0, 1, 2, 3], color: colors.main },
-        { indices: [4, 5, 6, 7], color: colors.light },
-        { indices: [0, 1, 5, 4], color: colors.shadow },
-        { indices: [2, 3, 7, 6], color: colors.light },
-        { indices: [1, 2, 6, 5], color: colors.main },
-        { indices: [0, 3, 7, 4], color: colors.shadow },
+      const innerVertices = [
+        project(-w / 2 + wallThickness, -h / 2 + wallThickness, -d / 2 + wallThickness),
+        project(w / 2 - wallThickness, -h / 2 + wallThickness, -d / 2 + wallThickness),
+        project(w / 2 - wallThickness, h / 2 - wallThickness, -d / 2 + wallThickness),
+        project(-w / 2 + wallThickness, h / 2 - wallThickness, -d / 2 + wallThickness),
+        project(-w / 2 + wallThickness, -h / 2 + wallThickness, d / 2 - wallThickness),
+        project(w / 2 - wallThickness, -h / 2 + wallThickness, d / 2 - wallThickness),
+        project(w / 2 - wallThickness, h / 2 - wallThickness, d / 2 - wallThickness),
+        project(-w / 2 + wallThickness, h / 2 - wallThickness, d / 2 - wallThickness),
       ];
 
-      faces.forEach((face) => {
-        const faceVertices = face.indices.map((i) => vertices[i]);
-        const avgZ = faceVertices.reduce((sum, v) => sum + v.z, 0) / faceVertices.length;
+      const walls = [
+        { outer: [0, 1, 2, 3], inner: [0, 1, 2, 3], color: colors.main, name: 'front' },
+        { outer: [4, 5, 6, 7], inner: [4, 5, 6, 7], color: colors.light, name: 'back' },
+        { outer: [0, 1, 5, 4], inner: [0, 1, 5, 4], color: colors.shadow, name: 'bottom' },
+        { outer: [2, 3, 7, 6], inner: [2, 3, 7, 6], color: colors.light, name: 'top' },
+        { outer: [1, 2, 6, 5], inner: [1, 2, 6, 5], color: colors.main, name: 'right' },
+        { outer: [0, 3, 7, 4], inner: [0, 3, 7, 4], color: colors.shadow, name: 'left' },
+      ];
 
-        ctx.fillStyle = face.color;
+      walls.forEach((wall) => {
+        const outerWall = wall.outer.map((i) => outerVertices[i]);
+        const innerWall = wall.inner.map((i) => innerVertices[i]);
+
+        ctx.fillStyle = wall.color + '80';
         ctx.strokeStyle = '#1A1F2C';
         ctx.lineWidth = 1.5;
 
         ctx.beginPath();
-        ctx.moveTo(faceVertices[0].x, faceVertices[0].y);
-        faceVertices.forEach((v) => ctx.lineTo(v.x, v.y));
+        ctx.moveTo(outerWall[0].x, outerWall[0].y);
+        outerWall.forEach((v) => ctx.lineTo(v.x, v.y));
         ctx.closePath();
         ctx.fill();
         ctx.stroke();
+
+        ctx.strokeStyle = '#1A1F2C';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(innerWall[0].x, innerWall[0].y);
+        innerWall.forEach((v) => ctx.lineTo(v.x, v.y));
+        ctx.closePath();
+        ctx.stroke();
+
+        for (let i = 0; i < 4; i++) {
+          const next = (i + 1) % 4;
+          ctx.beginPath();
+          ctx.moveTo(outerWall[i].x, outerWall[i].y);
+          ctx.lineTo(innerWall[i].x, innerWall[i].y);
+          ctx.stroke();
+        }
       });
     };
 
