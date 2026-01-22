@@ -42,6 +42,7 @@ const CabinetCanvas = ({ width, height, depth, material }: CabinetCanvasProps) =
       const h = height * scale;
       const d = depth * scale;
       const wallThickness = 1.6 * scale;
+      const backWallThickness = 0.3 * scale;
 
       const cos = Math.cos(angleYRef.current);
       const sin = Math.sin(angleYRef.current);
@@ -76,10 +77,10 @@ const CabinetCanvas = ({ width, height, depth, material }: CabinetCanvasProps) =
         project(w / 2 - wallThickness, -h / 2 + wallThickness, -d / 2 + wallThickness),
         project(w / 2 - wallThickness, h / 2 - wallThickness, -d / 2 + wallThickness),
         project(-w / 2 + wallThickness, h / 2 - wallThickness, -d / 2 + wallThickness),
-        project(-w / 2 + wallThickness, -h / 2 + wallThickness, d / 2 - wallThickness),
-        project(w / 2 - wallThickness, -h / 2 + wallThickness, d / 2 - wallThickness),
-        project(w / 2 - wallThickness, h / 2 - wallThickness, d / 2 - wallThickness),
-        project(-w / 2 + wallThickness, h / 2 - wallThickness, d / 2 - wallThickness),
+        project(-w / 2 + wallThickness, -h / 2 + wallThickness, d / 2 - backWallThickness),
+        project(w / 2 - wallThickness, -h / 2 + wallThickness, d / 2 - backWallThickness),
+        project(w / 2 - wallThickness, h / 2 - wallThickness, d / 2 - backWallThickness),
+        project(-w / 2 + wallThickness, h / 2 - wallThickness, d / 2 - backWallThickness),
       ];
 
       const walls = [
